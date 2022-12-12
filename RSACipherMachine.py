@@ -1,14 +1,23 @@
 # CS789 Cryptography
 # RSA Cipher Machine byZuowen Tang
 import random
-
 from tools import basicTools
 from tools import MRprimalityTest
 from tools import PRfactorFind
 
 
+def isPrime(val):
+    if MRprimalityTest.MillerRabinTest(val):
+        print("The modulus cannot be a prime number. \n")
+        return True
+    else:
+        return False
+
+
 # Encryption Algorithm
 def Encrypt(m, e):
+    if isPrime(m):
+        return
     plaintext = int(input("The plaintext is: "))
     ciphertext = basicTools.FastExponent(plaintext, e, m)  # Use fast exponential to get ciphertext
     print("Ciphertext is: ", int(ciphertext), "\n")
@@ -16,11 +25,12 @@ def Encrypt(m, e):
 
 # Algorithm for decryption without private kry (d)
 def Crack(m, e):
+    if isPrime(m):
+        return
     p, q = PRfactorFind.FindFac(m)  # Perform factorization on modulus
-
     if p == -1 and q == -1:  # The factorization needs to be reinitialized
         print("Quiting...")
-        return 0
+        return -1
 
     phi_n = (p - 1) * (q - 1)
     gcd, x, y = basicTools.gcdExtended(phi_n, e)
@@ -30,10 +40,14 @@ def Crack(m, e):
 
 # Decryption Algorithm
 def Decrypt(m, e, with_key):
+    if isPrime(m):
+        return
     if with_key:
         d = e
     else:
         d = Crack(m, e)  # get decrypt key first
+        if d == -1:
+            return
     ciphertext = int(input("The ciphertext is: "))
     plaintext = basicTools.FastExponent(ciphertext, d, m)
     print("The plaintext is: ", plaintext, "\n")
@@ -43,63 +57,53 @@ def Decrypt(m, e, with_key):
 def Driver():
     while True:  # Loop till user quits
         choice = None
+        print("----------------------------------")
+        print("  Welcome to RSA cipher machine!  ")
         while choice is None:
             try:
-                print("Welcome to RSA cipher machine!")
-                print("(1)Encrypt, (2)Decrypt, (3)Crack, (4)Quit")
+                print("(1)Encrypt, (2)Decrypt, (3)Crack, (4)Generate Keys (0)Quit")
                 choice = int(input("Please select a function: "))
-            except ValueError or choice != 1 or choice != 2 or choice != 3:
+            except ValueError:
                 print("Invalid input. \n")
                 continue
-        if choice == 4:
+            if choice < 0 or choice > 4:
+                print("Invalid input. \n")
+                choice = None
+                continue
+
+        if choice == 0:
             print("Quiting...")
-            return
-        elif 0 < choice < 4:
-            if choice == 1:
-                m, e = randMod(None, 1)
-                Encrypt(m, e)
-            elif choice == 2:
-                m, e = randMod("n", 2)
-                Decrypt(m, e, True)
-            elif choice == 3:
-                m, e = randMod("n", 3)
-                Decrypt(m, e, False)
+            quit()
+        elif choice == 1:
+            m, e = check(1)
+            Encrypt(int(m), int(e))
+        elif choice == 2:
+            m, e = check(2)
+            Decrypt(int(m), int(e), True)
+        elif choice == 3:
+            m, e = check(3)
+            Decrypt(int(m), int(e), False)
+        elif choice == 4:
+            getKey()
 
 
-def randMod(rand_mod, choice):
-    while rand_mod is None:
+def getKey():
+    rand_gen = None
+    while rand_gen is None:
         try:
-            rand_mod = input("Do you want to generate a pair of keys (y/n)? ")
-        except ValueError or rand_mod != "y" or rand_mod != "n":
-            print("Invalid input. \n")
-            continue
-
-    if rand_mod == "y":
-        rand_gen = None
-        while rand_gen is None:
-            try:
-                print("Which Pseudorandom Number Generator you wish to use?")
-                print("(1)Naor-Reingold (2)Blum-Blum-Shub (0)python default(only for test)")
-                rand_gen = int(input("Please select a generator: "))
-            except ValueError or rand_gen != 0 or rand_gen != 1 or rand_gen != 2:
-                print("Invalid input. \n")
-                continue
-        m, e, d = genRandKey(rand_gen)
-        print("Your public key is: (", m, e, ") and private key is: (", m, d, ")")
-        return m, e
-
-    while rand_mod == "n":
-        try:
-            if choice == 1 or choice == 2:
-                m, e = input("Enter private key (split with space): ").split(" ")
-                m, e = int(m), int(e)
-            if choice == 3:
-                m, e = input("Enter public key (split with space): ").split(" ")
-                m, e = int(m), int(e)
-            return m, e
+            print("Which Pseudorandom Number Generator you wish to use?")
+            print("(1)Naor-Reingold (2)Blum-Blum-Shub (0)python default(only for test)")
+            rand_gen = int(input("Please select a generator: "))
         except ValueError:
             print("Invalid input. \n")
             continue
+        if rand_gen < 0 or rand_gen > 2:
+            print("Invalid input. \n")
+            rand_gen = None
+            continue
+    m, e, d = genRandKey(rand_gen)
+    print("Your public key is: ( m =", m, ", e =", e, ") and private key is: ( m =", m, ", d =", d, ")\n")
+    return m, e
 
 
 def genRandKey(rand_gen):
@@ -121,4 +125,19 @@ def genRandKey(rand_gen):
     return m, pub_key, prv_key % phi_n
 
 
-Driver()
+def check(choice):
+    m, e = "m", "e"
+    while not m.isdigit() or not e.isdigit():
+        try:
+            if choice == 1 or choice == 3:
+                m, e = input("Enter public key m and e (split with space): ").split(" ")
+            else:
+                m, e = input("Enter private key m and e (split with space): ").split(" ")
+        except ValueError:
+            print("Invalid input. \n")
+            continue
+        if not m.isdigit() or not e.isdigit():
+            print("Invalid input. \n")
+            continue
+    return m, e
+
