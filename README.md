@@ -1,4 +1,5 @@
 # CS 789 Cryptography
 Homework and algorithms of CS789
 
-RSA Cipher Machine: https://replit.com/@Eldoov/RSACipherMachine?v=1
+RSA cipher machine and El-Gamal cipher machine
+Display page: https://replit.com/@Eldoov/Cipher-Machine?v=1
