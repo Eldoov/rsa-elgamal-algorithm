@@ -1,28 +1,7 @@
-# Naor-Reingold Pseudorandom Number Generator
-# CS789 Zuowen Tang
+# Naor-Reingold Pseudorandom Number Generator byZuowen Tang
+# BU-MET CS789 Cryptography
 import random
-
-
-def gcd(m, n):
-    if m < n:
-        x = m
-        m = n
-        n = x
-    if n == 0 or n == 1:
-        return abs(n)
-    else:
-        return gcd(n, (m % n))
-
-
-def FastExponent(x, e, m, y=1):
-    while e != 0:
-        if e % 2 == 0:
-            x = int((x * x) % m)
-            e = int(e / 2)
-        else:
-            y = int((x * y) % m)
-            e = int(e - 1)
-    return y
+from tools import basicTools
 
 
 def getA(n, num, x):
@@ -44,7 +23,7 @@ def getA(n, num, x):
             arr[j] = arr1[j]
     for k in range(0, n):
         arrplus += arr[k]
-    res = FastExponent(g, arrplus, num)
+    res = basicTools.FastExponent(arrplus, num, g)
     return res
 
 
@@ -53,7 +32,7 @@ def findSq(num):
     sqrt = 0
     while res != 1:
         sqrt = random.randint(1, num)
-        res = gcd(sqrt, num)
+        res = basicTools.gcd(sqrt, num)
     sq = (sqrt ** 2) % num
     return sq
 
@@ -84,21 +63,25 @@ def getBit(n, p, q, x):
 def getRand(count):
     array = ["0"] * count
     for i in range(0, count):
-        array[i] = str(getBit(6, 47, 37, 43))
+        array[i] = str(getBit(6, 47, 37, 43))  # getBit(n, p, q, x)
     res = "".join(array)
     return res
 
 
-
 def RandGen():
-    bits = getRand(12)
+    bits = getRand(16)  # Change 16 to number that > 0 to get a different bit long number
     rand_num = int(bits, 2)
     return rand_num
 
 
-# generating 12-bits long number
-# n = 6, p = 37, q = 47, x = 43
-print(RandGen())
+def RandGenBi():
+    bits = getRand(16)
+    return bits
 
 
+# generating 16-bits long number
+# n is a fixed number, x is a given number
+# both p & q are prime numbers
+# In this example, n = 6, p = 37, q = 47, x = 43
+# print(RandGenBi())
 
