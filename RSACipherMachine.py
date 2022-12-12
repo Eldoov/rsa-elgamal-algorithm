@@ -57,8 +57,8 @@ def Decrypt(m, e, with_key):
 def Driver():
     while True:  # Loop till user quits
         choice = None
-        print("----------------------------------")
-        print("  Welcome to RSA cipher machine!  ")
+        print("-------------------------------------")
+        print("   -Welcome to RSA cipher machine!-   ")
         while choice is None:
             try:
                 print("(1)Encrypt, (2)Decrypt, (3)Crack, (4)Generate Keys (0)Quit")
@@ -72,8 +72,8 @@ def Driver():
                 continue
 
         if choice == 0:
-            print("Quiting...")
-            quit()
+            print("\n")
+            return
         elif choice == 1:
             m, e = check(1)
             Encrypt(int(m), int(e))
@@ -140,4 +140,7 @@ def check(choice):
             print("Invalid input. \n")
             continue
     return m, e
+
+
+# Driver()
 
