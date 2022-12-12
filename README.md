@@ -9,9 +9,9 @@ I have coded these files under PyCharm IDE and haven't tested them in other IDE,
 
 If you have any trouble with them, please let me know; you can also choose to check them on:
 
-​	my GitHub page: https://github.com/Eldoov/CS789-Algorithms
+- my GitHub page: https://github.com/Eldoov/CS789-Algorithms
 
-​	Replit online IDE for a direct display: https://replit.com/@Eldoov/Cipher-Machine?v=1
+- Replit online IDE for a direct display: https://replit.com/@Eldoov/Cipher-Machine?v=1
 
 
 
