@@ -175,9 +175,9 @@ def eve():
 
 def Driver():
     while True:
-        role = None
         print("-------------------------------------")
         print("-Welcome to El-Gamal Cipher Machine!-")
+        role = None
         while role is None:
             try:
                 role = int(input("You are (1)Alice (2)Bob (3)Eve (0)Quit: "))
