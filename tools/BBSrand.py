@@ -1,17 +1,7 @@
-# Blum-Blum-Shub Pseudorandom Number Generator
-# CS789 Zuowen Tang
+# Blum-Blum-Shub Pseudorandom Number Generator byZuowen Tang
+# BU-MET CS789 Cryptography
 import random
-
-
-def gcd(m, n):
-    if m < n:
-        x = m
-        m = n
-        n = x
-    if n == 0 or n == 1:
-        return abs(n)
-    else:
-        return gcd(n, (m % n))
+from tools import basicTools
 
 
 def findSeed(num):
@@ -19,7 +9,7 @@ def findSeed(num):
     seed = 0
     while res != 1:
         seed = random.randint(1, num)
-        res = gcd(seed, num)
+        res = basicTools.gcd(seed, num)
     return seed
 
 
@@ -33,7 +23,7 @@ def getBit(n):
         s0 = s1
         array[i] = s1
     for j in range(0, n):
-        bits_array[i] = array[i] % 2
+        bits_array[j] = array[j] % 2
     res = bits_array[n-1]
     return res
 
@@ -48,12 +38,12 @@ def getRand(count, p, q):
 
 
 def RandGen():
-    bits = getRand(12, 11, 23)
+    bits = getRand(16, 11, 23)  # getRand(16bit, p, q)
     rand_num = int(bits, 2)
     return rand_num
 
 
-# generating 12-bit long number
-# p = 11, q = 23
-print(RandGen())
-
+# generating 16-bit long number
+# both p & q are prime numbers that also ≡ 3%4
+# In this example, p = 11, q = 23
+# print(RandGen())
