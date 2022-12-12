@@ -177,7 +177,7 @@ def Driver():
     while True:
         role = None
         print("-------------------------------------")
-        print(" Welcome to El-Gamal Cipher Machine! ")
+        print("-Welcome to El-Gamal Cipher Machine!-")
         while role is None:
             try:
                 role = int(input("You are (1)Alice (2)Bob (3)Eve (0)Quit: "))
@@ -198,6 +198,8 @@ def Driver():
             eve()
             continue
         elif role == 0:
-            print("Quiting...")
-            quit()
-            
+            print("\n")
+            return
+
+
+# Driver()
