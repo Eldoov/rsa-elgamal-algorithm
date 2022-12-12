@@ -7,18 +7,19 @@ from tools import BBstepGNstep
 
 
 def alice_pub_info(rand_gen, r):
-    b = 0
-    p = [0]
-    while p[0] < 1000:  # get a prime number larger than 100
-        p = MRprimalityTest.getPrime(1, rand_gen)
-    p = p[0]  # p is a prime number
+    max, b = 0, 0
+    p = MRprimalityTest.getPrime(5, rand_gen)
+    for i in range(0, 5):
+        if p[i] > max:
+            max = p[i]
+    p = max
 
     # generate b, one of the primitive roots
     for i in range(0, 10):
         if basicTools.gcd(b, p - 1) == 1:  # phi(p) = p-1 since p is a prime number
             break
         else:
-            b = random.randint(2, p)
+            b = random.randint(2, p-1)
 
     # generate r as random number if user did not input r
     if r is None:
@@ -54,9 +55,14 @@ def alice():
     while choice is None:
         try:
             choice = int(input("Do you wish to (1)Get public info (2)Encrypt a message: "))
-        except ValueError or choice != 1 or choice != 2:
+        except ValueError:
             print("Invalid input. \n")
             continue
+        if choice > 2 or choice < 1:
+            print("Invalid input. \n")
+            choice = None
+            continue
+
     if choice == 1:
         r = input("Enter your own random number?(y/n) :")
         if r == "y":
@@ -65,10 +71,16 @@ def alice():
             r = None
         alice_pub_info(2, r)
     if choice == 2:
-        message = int(input("Enter the message: "))
-        bl = int(input("Enter Bob's public key: "))
-        r = int(input("Enter Alice's private key: "))
-        p = int(input("Enter the prime number: "))
+        p = None
+        while p is None:
+            try:
+                message = int(input("Enter the message: "))
+                bl = int(input("Enter Bob's public key: "))
+                r = int(input("Enter Alice's private key: "))
+                p = int(input("Enter the prime number: "))
+            except ValueError:
+                print("Invalid input. \n")
+                continue
         brl = basicTools.FastExponent(bl, r, p)
         cipher = encrypt(brl, message, p)
         print("The ciphertext is ", cipher, "\n")
@@ -79,16 +91,22 @@ def bob():
     while choice is None:
         try:
             choice = int(input("Do you wish to (1)Get public info (2)Decrypt a message: "))
-        except ValueError or choice != 1 or choice != 2:
+        except ValueError:
+            print("Invalid input. \n")
+            continue
+        if choice != 1 or 2:
             print("Invalid input. \n")
             continue
     if choice == 1:
         print("Enter Alice's public info below (split with space) ")
-        p = None
-        while p is None:
+        p, b, br = "p", "b", "br"
+        while not p.isdigit() or not b.isdigit() or not br.isdigit():
             try:
                 p, b, br = input("Prime number, generator, public key: ").split(" ")
             except ValueError:
+                print("Invalid input. \n")
+                continue
+            if not p.isdigit() or not b.isdigit() or not br.isdigit():
                 print("Invalid input. \n")
                 continue
         if not MRprimalityTest.MillerRabinTest(int(p)):
@@ -98,7 +116,10 @@ def bob():
         while l is None:
             try:
                 l = input("Enter your own random number?(y/n) :")
-            except ValueError or choice != "y" or choice != "y":
+            except ValueError:
+                print("Invalid input. \n")
+                continue
+            if choice != "y" or "n":
                 print("Invalid input. \n")
                 continue
         if l == "y":
@@ -107,10 +128,16 @@ def bob():
             l = None
         bob_pub_info(int(p), int(b), l)
     elif choice == 2:
-        cipher = int(input("Enter the ciphertext: "))
-        br = int(input("Enter Alice's public key: "))
-        l = int(input("Enter Bob's private key: "))
-        p = int(input("Enter the prime number: "))
+        p = None
+        while p is None:
+            try:
+                cipher = int(input("Enter the ciphertext: "))
+                br = int(input("Enter Alice's public key: "))
+                l = int(input("Enter Bob's private key: "))
+                p = int(input("Enter the prime number: "))
+            except ValueError:
+                print("Invalid input.")
+                continue
         brl = basicTools.FastExponent(br, l, p)
         gcd, x, y = basicTools.gcdExtended(p, brl)
         brl_rev = y % p
@@ -119,11 +146,17 @@ def bob():
 
 
 def eve():
-    cipher = int(input("Enter the ciphertext: "))
-    b = int(input("Enter the generator: "))
-    br = int(input("Enter Alice's public key: "))
-    bl = int(input("Enter Bob's public key: "))
-    p = int(input("Enter the prime number: "))
+    p = None
+    while p is None:
+        try:
+            cipher = int(input("Enter the ciphertext: "))
+            b = int(input("Enter the generator: "))
+            br = int(input("Enter Alice's public key: "))
+            bl = int(input("Enter Bob's public key: "))
+            p = int(input("Enter the prime number: "))
+        except ValueError:
+            print("Invalid input.")
+            continue
 
     # Get private keys
     r = BBstepGNstep.Driver(br, b, p)
@@ -143,12 +176,17 @@ def eve():
 def Driver():
     while True:
         role = None
+        print("-------------------------------------")
+        print(" Welcome to El-Gamal Cipher Machine! ")
         while role is None:
             try:
-                print("Welcome to El-Gamal Cipher Machine!")
-                role = int(input("You are (1)Alice (2)Bob (3)Eve (4)Quit: "))
-            except ValueError or role != 1 or role != 2 or role != 3 or role != 4:
+                role = int(input("You are (1)Alice (2)Bob (3)Eve (0)Quit: "))
+            except ValueError:
                 print("Invalid input. \n")
+                continue
+            if role > 3 or role < 0:
+                print("Invalid input. \n")
+                role = None
                 continue
         if role == 1:
             alice()
@@ -159,9 +197,7 @@ def Driver():
         elif role == 3:
             eve()
             continue
-        elif role == 4:
+        elif role == 0:
             print("Quiting...")
-            return
-
-
-Driver()
+            quit()
+            
