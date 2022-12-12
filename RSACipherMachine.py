@@ -1,103 +1,124 @@
 # CS789 Cryptography
-# RSA Cipher Machine by Zuowen Tang
+# RSA Cipher Machine byZuowen Tang
+import random
 
+from tools import basicTools
+from tools import MRprimalityTest
+from tools import PRfactorFind
+
+
+# Encryption Algorithm
 def Encrypt(m, e):
     plaintext = int(input("The plaintext is: "))
-    ciphertext = FastExponent(m, plaintext, e)
+    ciphertext = basicTools.FastExponent(plaintext, e, m)  # Use fast exponential to get ciphertext
     print("Ciphertext is: ", int(ciphertext), "\n")
-    Driver()
 
 
-def DecryptKey(m, e):
-    p, q = FindFac(m)
-    print("p is", p, "q is", q)
-    phi_n = (p-1)*(q-1)
-    print("Phi(n) is :", p, "- 1 *", q, "- 1 =", phi_n)
-    d = multi_inverse(e, phi_n)
-    print("The decrypt key is: ", d)
+# Algorithm for decryption without private kry (d)
+def Crack(m, e):
+    p, q = PRfactorFind.FindFac(m)  # Perform factorization on modulus
+
+    if p == -1 and q == -1:  # The factorization needs to be reinitialized
+        print("Quiting...")
+        return 0
+
+    phi_n = (p - 1) * (q - 1)
+    gcd, x, y = basicTools.gcdExtended(phi_n, e)
+    d = y % phi_n
     return d
 
 
-def Decrypt(m, e):
-    d = DecryptKey(m, e)
-    ciphertext = int(input("The ciphertext is: "))
-    plaintext = FastExponent(m, ciphertext, d)
-    print("The plaintext is: ", plaintext, "\n")
-    Driver()
-
-
-def gcd(m, n):
-    if n == 0:
-        return abs(m)
+# Decryption Algorithm
+def Decrypt(m, e, with_key):
+    if with_key:
+        d = e
     else:
-        return gcd(n, (m % n))
+        d = Crack(m, e)  # get decrypt key first
+    ciphertext = int(input("The ciphertext is: "))
+    plaintext = basicTools.FastExponent(ciphertext, d, m)
+    print("The plaintext is: ", plaintext, "\n")
 
 
-def factor(n):
-    x = 2
-    y = (x**2) + 1
-    for i in range(0, n):
-        g = gcd((x - y), n)
-        if g != 1:
-            return g
-        elif g == 1:
-            x = (x**2 + 1) % n
-            y = ((y**2 + 1)**2 + 1) % n
-        elif g == n:
-            print("The algorithm needs to be reinitialized.")
-            return
-
-
-def FindFac(n):
-    a = factor(n)
-    b = int(n / a)
-    return a, b
-
-
-def multi_inverse(x, m):
-    if m > x:
-        x += m
-    for y in range(x+1):
-        if(x * y) % m == 1:
-            k = int(((x-m) * y - 1)/m)
-            res = y
-            print("y is:", y, "| k is:", k)
-            print(x - m, "*", y, "=", k, "*", m, "+ 1", "\n")
-    return res
-
-
-def FastExponent(m, x, e, y=1):
-    while e != 0:
-        if e % 2 == 0:
-            x = int((x * x) % m)
-            e = int(e / 2)
-        else:
-            y = int((x * y) % m)
-            e = int(e - 1)
-    return y
-
-
+# Start the cipher machine
 def Driver():
-    while True:
-        print("Welcome to RSA cipher machine!")
-        print("(1)Encrypt, (2)Decrypt, (3)Get Decrypt Key, (4)Quit")
-        choice = int(input("Please select a function: "))
+    while True:  # Loop till user quits
+        choice = None
+        while choice is None:
+            try:
+                print("Welcome to RSA cipher machine!")
+                print("(1)Encrypt, (2)Decrypt, (3)Crack, (4)Quit")
+                choice = int(input("Please select a function: "))
+            except ValueError or choice != 1 or choice != 2 or choice != 3:
+                print("Invalid input. \n")
+                continue
         if choice == 4:
             print("Quiting...")
             return
-        elif choice != 1 or 2 or 3:
+        elif 0 < choice < 4:
+            if choice == 1:
+                m, e = randMod(None, 1)
+                Encrypt(m, e)
+            elif choice == 2:
+                m, e = randMod("n", 2)
+                Decrypt(m, e, True)
+            elif choice == 3:
+                m, e = randMod("n", 3)
+                Decrypt(m, e, False)
+
+
+def randMod(rand_mod, choice):
+    while rand_mod is None:
+        try:
+            rand_mod = input("Do you want to generate a pair of keys (y/n)? ")
+        except ValueError or rand_mod != "y" or rand_mod != "n":
             print("Invalid input. \n")
             continue
+
+    if rand_mod == "y":
+        rand_gen = None
+        while rand_gen is None:
+            try:
+                print("Which Pseudorandom Number Generator you wish to use?")
+                print("(1)Naor-Reingold (2)Blum-Blum-Shub (0)python default(only for test)")
+                rand_gen = int(input("Please select a generator: "))
+            except ValueError or rand_gen != 0 or rand_gen != 1 or rand_gen != 2:
+                print("Invalid input. \n")
+                continue
+        m, e, d = genRandKey(rand_gen)
+        print("Your public key is: (", m, e, ") and private key is: (", m, d, ")")
+        return m, e
+
+    while rand_mod == "n":
+        try:
+            if choice == 1 or choice == 2:
+                m, e = input("Enter private key (split with space): ").split(" ")
+                m, e = int(m), int(e)
+            if choice == 3:
+                m, e = input("Enter public key (split with space): ").split(" ")
+                m, e = int(m), int(e)
+            return m, e
+        except ValueError:
+            print("Invalid input. \n")
+            continue
+
+
+def genRandKey(rand_gen):
+    prv_key, pub_key = -1, 0
+    count = 0
+    m, p, q = MRprimalityTest.getModulus(2, rand_gen)
+    phi_n = (p - 1) * (q - 1)
+    # print(p, "- 1 *", q,"- 1 =", (p - 1) * (q - 1))
+
+    for i in range(0, 10):
+        if basicTools.gcd(pub_key, phi_n) == 1:
+            break
         else:
-            m = int(input("Enter the modulus: "))
-            e = int(input("Enter the exponent: "))
-        if choice == 1:
-            Encrypt(m, e)
-        elif choice == 2:
-            Decrypt(m, e)
-        elif choice == 3:
-            DecryptKey(m, e)
+            pub_key = random.randint(2, phi_n)
+
+    gcd, x, y = basicTools.gcdExtended(phi_n, pub_key)
+    prv_key = y % phi_n
+    # print("pubkey: (", m, ",", pub_key, "), prvkey: (", m, ",", prv_key % phi_n, ")", phi_n)
+    return m, pub_key, prv_key % phi_n
 
 
 Driver()
-
