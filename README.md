@@ -6,27 +6,29 @@
 
 ### <u>To run the program:</u> 
 
- - Load the entire folder in your IDE and run <u>**main.py**</u>
+​	Load the entire <u>CipherMachine</u> folder in your IDE and run <u>**main.py**</u>
 
 
+
+The default bits of a random number generator are 24 bits. You may try to a larger number for testing; however, this WILL increase the calculation time.
 
 
 
 ## RSA Cipher Machine
 
-This machine has four functions: (1)**encryption**, (2)**decryption**, (3) **decryption** without a private key, and (4) **key generation**.
+This machine has five functions: (1)**encryption**, (2)**decryption**, (3) **decryption** without a private key, (4) **key generation**, and (5) **autorun**.
 
-By entering numbers, you should be able to choose which function you wish to use. You can choose different pseudorandom number generators for key generation or use your own key. *There's a very low chance that Naor-Reingold will get stuck, just quit the program and re-enter.*
+By entering numbers, you should be able to choose which function you wish to use. You can choose different pseudorandom number generators for the key generation or use your own key. *There's a very low chance that Naor-Reingold will get stuck; just quit the program and re-enter.*
+
+The autorun function can show how the encryption and decryption go under a random situation. Please check the samples for further details.
 
 Have fun with it.
 
 
 
-
-
 ## El-Gamal Cipher Machine
 
-In this machine, you can be three different roles: (1)**Alice**, (2)**Bob**, or (3)**Eve**; each fits into traditional roles of computer security. 
+In this machine, you can be three different roles: (1)**Alice**, (2)**Bob**, (3)**Eve**, or (4)**Autoran**; each fits into traditional roles of computer security. 
 
 As Alice, you can: 
 
@@ -44,17 +46,23 @@ As Eve, you can:
 
 
 
+The **autorun** function can show how the encryption and decryption go under a random situation. Please check the samples for further details.
+
+***Note:** In autorun, Eve usually spends less than 10 sec to crack a 24-bit random key. With a larger number, Eve will need more time to crack the key and might not success.*
+
+
+
 ---
 
 ### Troubleshooting
 
 I have coded these files under PyCharm IDE and haven't tested them in other IDE, but they should work fine if all files in this folder are left untouched. 
 
-If you have any trouble with them, please let me know; you can also choose to check them on:
+If you have any trouble with them, please let me know; you can also choose to check them on :
 
-- my GitHub page: https://github.com/Eldoov/CS789-Algorithms 
+- My GitHub page: https://github.com/Eldoov/rsa-elgamal-algorithm
 
-- or Replit online IDE for a direct display: https://replit.com/@Eldoov/Cipher-Machine?v=1
+- Replit online IDE for a direct display: https://replit.com/@Eldoov/Cipher-Machine?v=1
 
 
 
