@@ -21,8 +21,7 @@ def Encrypt(m, e):
     if isPrime(m):
         return
     plaintext = int(input("The plaintext is: "))
-    ciphertext = basicTools.FastExponent(
-        plaintext, e, m)  # Use fast exponential to get ciphertext
+    ciphertext = basicTools.FastExponent(plaintext, e, m)  # Use fast exponential to get ciphertext
     print("Ciphertext is: ", int(ciphertext), "\n")
 
 
@@ -64,7 +63,8 @@ def Driver():
         print("   -Welcome to RSA cipher machine!-   ")
         while choice is None:
             try:
-                print("(1)Encrypt, (2)Decrypt, (3)Crack, (4)Generate Keys (5)Autorun (0)Quit")
+                print("(1)Encrypt (2)Decrypt (3)Crack")
+                print("(4)Generate Keys (5)Autorun (0)Quit")
                 choice = int(input("Please select a function: "))
             except ValueError:
                 print("Invalid input. \n")
@@ -151,6 +151,7 @@ def check(choice):
 
 
 def autorun():
+    print("\nStarting autorun...")
     print("Generating random keys...")
     rand_gen = random.randint(1, 2)
     m, e, d = genRandKey(rand_gen)
