@@ -4,6 +4,8 @@ import random
 from tools import basicTools
 from tools import MRprimalityTest
 from tools import PRfactorFind
+from tools import BBSrand
+from tools import NRrand
 
 
 def isPrime(val):
@@ -19,7 +21,8 @@ def Encrypt(m, e):
     if isPrime(m):
         return
     plaintext = int(input("The plaintext is: "))
-    ciphertext = basicTools.FastExponent(plaintext, e, m)  # Use fast exponential to get ciphertext
+    ciphertext = basicTools.FastExponent(
+        plaintext, e, m)  # Use fast exponential to get ciphertext
     print("Ciphertext is: ", int(ciphertext), "\n")
 
 
@@ -61,12 +64,12 @@ def Driver():
         print("   -Welcome to RSA cipher machine!-   ")
         while choice is None:
             try:
-                print("(1)Encrypt, (2)Decrypt, (3)Crack, (4)Generate Keys (0)Quit")
+                print("(1)Encrypt, (2)Decrypt, (3)Crack, (4)Generate Keys (5)Autorun (0)Quit")
                 choice = int(input("Please select a function: "))
             except ValueError:
                 print("Invalid input. \n")
                 continue
-            if choice < 0 or choice > 4:
+            if choice < 0 or choice > 5:
                 print("Invalid input. \n")
                 choice = None
                 continue
@@ -85,6 +88,8 @@ def Driver():
             Decrypt(int(m), int(e), False)
         elif choice == 4:
             getKey()
+        elif choice == 5:
+            autorun()
 
 
 def getKey():
@@ -92,7 +97,8 @@ def getKey():
     while rand_gen is None:
         try:
             print("Which Pseudorandom Number Generator you wish to use?")
-            print("(1)Naor-Reingold (2)Blum-Blum-Shub (0)python default(only for test)")
+            print(
+                "(1)Naor-Reingold (2)Blum-Blum-Shub (0)python default(only for test)")
             rand_gen = int(input("Please select a generator: "))
         except ValueError:
             print("Invalid input. \n")
@@ -130,9 +136,11 @@ def check(choice):
     while not m.isdigit() or not e.isdigit():
         try:
             if choice == 1 or choice == 3:
-                m, e = input("Enter public key m and e (split with space): ").split(" ")
+                m, e = input("Enter public key m and e (split with space): ").split(
+                    " ")
             else:
-                m, e = input("Enter private key m and e (split with space): ").split(" ")
+                m, e = input("Enter private key m and e (split with space): ").split(
+                    " ")
         except ValueError:
             print("Invalid input. \n")
             continue
@@ -142,5 +150,41 @@ def check(choice):
     return m, e
 
 
-# Driver()
+def autorun():
+    print("Generating random keys...")
+    rand_gen = random.randint(1, 2)
+    m, e, d = genRandKey(rand_gen)
+    print("Alice's public key is: ( m =", m, ", e =", e, ")")
+    print("and private key is: ( m =", m, ", d =", d, ")\n")
 
+    if rand_gen == 1:
+        message = NRrand.RandGen()
+    elif rand_gen == 2:
+        message = BBSrand.RandGen()
+    print("Bob wants to send message", message, "to her.")
+    print("Bob encrypts the message", message, "using Alice's public key.")
+
+    ciphertext = basicTools.FastExponent(message, e, m)  # Use fast exponential to get ciphertext
+    print("The cipher text is", ciphertext, "\n")
+
+    print("Alice receives the ciphertext from Bob and decrypts it with her private key.")
+    plaintext = basicTools.FastExponent(ciphertext, d, m)
+    print("She gets the plaintext", plaintext, "\n")
+
+    print("Eve also knows the ciphertext Bob sends to Alice;")
+    print("however she does not have the private key to decrypt the message.")
+    print("She tries to crack it without private key.")
+    p, q = PRfactorFind.FindFac(m)  # Perform factorization on modulus
+    phi_n = (p - 1) * (q - 1)
+    gcd, x, y = basicTools.gcdExtended(phi_n, e)
+    d2 = y % phi_n
+    print("By calculating the factor of the modulus, Eve finds", p, "and", q)
+    print("which are the prime factors of the modulus", m)
+    print("Eve now can have Alice's private key (", m, d2, ")")
+    print("and thus able to decrypt the message.")
+    plaintext2 = basicTools.FastExponent(ciphertext, d2, m)
+    print("Eve gets the result:", plaintext2, "\n")
+    print("Autorun is finished.\n")
+
+
+# Driver()
