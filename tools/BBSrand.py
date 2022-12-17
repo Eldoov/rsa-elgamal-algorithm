@@ -38,12 +38,12 @@ def getRand(count, p, q):
 
 
 def RandGen():
-    bits = getRand(16, 11, 23)  # getRand(16bit, p, q)
+    bits = getRand(24, 11, 23)  # getRand(x-bit, p, q)
     rand_num = int(bits, 2)
     return rand_num
 
 
-# generating 16-bit long number
+# generating 24-bit long number
 # both p & q are prime numbers that also ≡ 3%4
 # In this example, p = 11, q = 23
 # print(RandGen())

@@ -69,19 +69,21 @@ def getRand(count):
 
 
 def RandGen():
-    bits = getRand(16)  # Change 16 to number that > 0 to get a different bit long number
+    bits = getRand(24)  # Change x to number that > 0 to get a different bit long number
     rand_num = int(bits, 2)
     return rand_num
 
 
 def RandGenBi():
-    bits = getRand(16)
+    bits = getRand(24)
     return bits
 
 
-# generating 16-bits long number
+# generating x-bits long number
 # n is a fixed number, x is a given number
 # both p & q are prime numbers
 # In this example, n = 6, p = 37, q = 47, x = 43
-# print(RandGenBi())
+# print(RandGen())
+
+
 

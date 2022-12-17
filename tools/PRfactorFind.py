@@ -4,6 +4,7 @@
 # if g = 1, replace x by (x^2 + 1)%n and y by ((y^2 + 1)^2 + 1)%n, repeat
 # in rare case g = n, re-initiate the algorithm
 from tools import basicTools
+from tools import MRprimalityTest
 
 
 def factor(n):
