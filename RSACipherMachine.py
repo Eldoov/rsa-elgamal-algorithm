@@ -4,8 +4,6 @@ import random
 from tools import basicTools
 from tools import MRprimalityTest
 from tools import PRfactorFind
-from tools import BBSrand
-from tools import NRrand
 
 
 def isPrime(val):
@@ -51,6 +49,11 @@ def Decrypt(m, e, with_key):
         if d == -1:
             return
     ciphertext = int(input("The ciphertext is: "))
+
+    if basicTools.gcd(ciphertext, m) != 1:
+        print("Ciphertext is not relatively prime to the modulus.")
+        return
+
     plaintext = basicTools.FastExponent(ciphertext, d, m)
     print("The plaintext is: ", plaintext, "\n")
 
@@ -107,14 +110,14 @@ def getKey():
             print("Invalid input. \n")
             rand_gen = None
             continue
-    m, e, d = genRandKey(rand_gen)
-    print("Your public key is: ( m =", m, ", e =", e, ") and private key is: ( m =", m, ", d =", d, ")\n")
+    m, e, d, message = genRandKey(rand_gen)
+    print("Your public key is: ( m =", m, ", e =", e, ") and private key is: ( m =", m, ", d =", d, ")")
+    print("Your random message is:", message, "\n")
     return m, e
 
 
 def genRandKey(rand_gen):
-    prv_key, pub_key = -1, 0
-    count = 0
+    prv_key, pub_key, message = -1, 0, 0
     m, p, q = MRprimalityTest.getModulus(2, rand_gen)
     phi_n = (p - 1) * (q - 1)
     # print(p, "- 1 *", q,"- 1 =", (p - 1) * (q - 1))
@@ -125,10 +128,16 @@ def genRandKey(rand_gen):
         else:
             pub_key = random.randint(2, phi_n)
 
+    for i in range(0, 10):
+        if basicTools.gcd(message, phi_n) == 1:
+            break
+        else:
+            message = random.randint(1, m)
+
     gcd, x, y = basicTools.gcdExtended(phi_n, pub_key)
     prv_key = y % phi_n
     # print("pubkey: (", m, ",", pub_key, "), prvkey: (", m, ",", prv_key % phi_n, ")", phi_n)
-    return m, pub_key, prv_key % phi_n
+    return m, pub_key, prv_key % phi_n, message
 
 
 def check(choice):
@@ -154,19 +163,15 @@ def autorun():
     print("\nStarting autorun...")
     print("Generating random keys...")
     rand_gen = random.randint(1, 2)
-    m, e, d = genRandKey(rand_gen)
+    m, e, d, message = genRandKey(rand_gen)
     print("Alice's public key is: ( m =", m, ", e =", e, ")")
     print("and private key is: ( m =", m, ", d =", d, ")\n")
 
-    if rand_gen == 1:
-        message = NRrand.RandGen()
-    elif rand_gen == 2:
-        message = BBSrand.RandGen()
     print("Bob wants to send message", message, "to her.")
-    print("Bob encrypts the message", message, "using Alice's public key.")
+    print("Bob encrypts the message using Alice's public key.")
 
     ciphertext = basicTools.FastExponent(message, e, m)  # Use fast exponential to get ciphertext
-    print("The cipher text is", ciphertext, "\n")
+    print("The ciphertext is", ciphertext, "\n")
 
     print("Alice receives the ciphertext from Bob and decrypts it with her private key.")
     plaintext = basicTools.FastExponent(ciphertext, d, m)
@@ -181,7 +186,7 @@ def autorun():
     d2 = y % phi_n
     print("By calculating the factor of the modulus, Eve finds", p, "and", q)
     print("which are the prime factors of the modulus", m)
-    print("Eve now can have Alice's private key (", m, d2, ")")
+    print("Eve now can have Alice's private key (", m, ",", d2, ")")
     print("and thus able to decrypt the message.")
     plaintext2 = basicTools.FastExponent(ciphertext, d2, m)
     print("Eve gets the result:", plaintext2, "\n")

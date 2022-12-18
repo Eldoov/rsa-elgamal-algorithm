@@ -6,6 +6,7 @@ from tools import MRprimalityTest
 from tools import BBstepGNstep
 from tools import BBSrand
 from tools import NRrand
+from tools import PRfactorFind
 
 
 def alice_pub_info(rand_gen, r):
@@ -17,11 +18,7 @@ def alice_pub_info(rand_gen, r):
     p = max
 
     # generate b, one of the primitive roots
-    for i in range(0, 10):
-        if basicTools.gcd(b, p - 1) == 1:  # phi(p) = p-1 since p is a prime number
-            break
-        else:
-            b = random.randint(2, p - 1)
+    b = PRfactorFind.pri_root_search(p)
 
     # generate r as random number if user did not input r
     if r is None:
@@ -103,7 +100,7 @@ def bob():
         except ValueError:
             print("Invalid input. \n")
             continue
-        if choice != 1 or 2:
+        if choice > 2 or choice < 1:
             print("Invalid input. \n")
             continue
     if choice == 1:
@@ -118,9 +115,16 @@ def bob():
             if not p.isdigit() or not b.isdigit() or not br.isdigit():
                 print("Invalid input. \n")
                 continue
+
+        # check if p is prime
         if not MRprimalityTest.MillerRabinTest(int(p)):
             print(p, "is not a prime number.\n")
             return
+        # check b if primitive root
+        if not PRfactorFind.check_root(b, p):
+            print(b, "is not a primitive root of", p, "\n")
+            return
+
         rand = None
         while rand is None:
             try:
@@ -171,6 +175,11 @@ def eve():
         except ValueError:
             print("Invalid input.")
             continue
+
+    # check b if primitive root
+    if not PRfactorFind.check_root(b, p):
+        print(b, "is not a primitive root of", p, "\n")
+        return
 
     # Get private keys
     r = BBstepGNstep.Driver(br, b, p)
@@ -230,11 +239,8 @@ def autorun():
         max = p[i]
     p = max
 
-    for i in range(0, 10):
-        if basicTools.gcd(b, p - 1) == 1:  # phi(p) = p-1 since p is a prime number
-            break
-        else:
-            b = random.randint(2, p - 1)
+    # generate primitive root b
+    b = PRfactorFind.pri_root_search(p)
 
     # generate r and l as random numbers
     r = MRprimalityTest.getPrime(1, rand_gen)
