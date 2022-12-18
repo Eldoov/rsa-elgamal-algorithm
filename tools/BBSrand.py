@@ -43,7 +43,7 @@ def RandGen():
     return rand_num
 
 
-# generating 24-bit long number
+# generating 32-bit long number
 # both p & q are prime numbers that also ≡ 3%4
 # In this example, p = 11, q = 23
 # print(RandGen())

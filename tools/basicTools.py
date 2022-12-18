@@ -30,15 +30,26 @@ def multi_inverse(x, m):
 
 # Fast Exponentiation Algorithm
 # (x^e)%m = 0log(e)
-def FastExponent(x, e, m, y=1):
+def BadFastExponent(x, e, m, y=1):
     while e != 0:
         if e % 2 == 0:
-            x = int((x * x) % m)
+            x = int(x ** 2 % m)
             e = int(e / 2)
         else:
-            y = int((x * y) % m)
+            y = int(x * y % m)
             e = int(e - 1)
     return y
+
+
+# Better Fast Exponentiation Algorithm
+def FastExponent(x, e, m, y=1):
+    e = int(e)
+    while e > 1:
+        if e & 1:
+            y = (y * x) % m
+        x = x ** 2 % m
+        e >>= 1
+    return (x * y) % m
 
 
 # Extended euclidean Algorithm
