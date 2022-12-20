@@ -120,10 +120,6 @@ def bob():
         if not MRprimalityTest.MillerRabinTest(int(p)):
             print(p, "is not a prime number.\n")
             return
-        # check b if primitive root
-        if not PRfactorFind.check_root(b, p):
-            print(b, "is not a primitive root of", p, "\n")
-            return
 
         rand = None
         while rand is None:
@@ -175,11 +171,6 @@ def eve():
         except ValueError:
             print("Invalid input.")
             continue
-
-    # check b if primitive root
-    if not PRfactorFind.check_root(b, p):
-        print(b, "is not a primitive root of", p, "\n")
-        return
 
     # Get private keys
     r = BBstepGNstep.Driver(br, b, p)
