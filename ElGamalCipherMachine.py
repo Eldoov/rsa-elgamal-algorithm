@@ -128,7 +128,7 @@ def bob():
             except ValueError:
                 print("Invalid input. \n")
                 continue
-            if choice != "y" or "n":
+            if rand != "y" and rand != "n":
                 print("Invalid input. \n")
                 continue
         l = None
